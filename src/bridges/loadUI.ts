@@ -21,20 +21,14 @@ const loadUI = async () => {
   }
 
   // Setup UI
-  penpot.ui.open(
-    tolgee.t('fullName', {
-      instance: globalConfig.env.isDev ? '/dev' : '/one',
-    }),
-    globalConfig.urls.uiUrl,
-    {
-      width: windowSize.width,
-      height: windowSize.height,
-    }
-  )
+  penpot.ui.open('{{ pluginName }}', globalConfig.urls.uiUrl, {
+    width: windowSize.width,
+    height: windowSize.height,
+  })
 
   // Listen to messages from UI to Canvas
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  penpot.ui.onMessage = async (msg: any) => {
+  penpot.ui.onMessage(async (msg: any) => {
     const path = msg.pluginMessage
 
     const actions: { [key: string]: () => void } = {
@@ -201,7 +195,7 @@ const loadUI = async () => {
     } catch {
       return actions['DEFAULT']?.()
     }
-  }
+  })
 
   // Listeners
   penpot.on('themechange', () => {

@@ -112,16 +112,13 @@ const tolgee = initTolgee(tolgeeUrl, tolgeeApiKey, globalConfig.lang, {
 })
 
 // Bridge Canvas <> UI
-window.addEventListener(
-  'message',
-  (event: MessageEvent) => {
-    const pluginEvent = new CustomEvent('platformMessage', {
-      detail: event.data.pluginMessage,
-    })
-    window.dispatchEvent(pluginEvent)
-  },
-  false
-)
+window.addEventListener('message', (event) => {
+  const data = event.data
+  const pluginEvent = new CustomEvent('platformMessage', {
+    detail: data,
+  })
+  window.dispatchEvent(pluginEvent)
+})
 
 window.addEventListener('pluginMessage', ((event: MessageEvent) => {
   if (event instanceof CustomEvent && window.parent !== window) {
