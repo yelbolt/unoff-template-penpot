@@ -1,17 +1,8 @@
 {
   "mcpServers": {
-    "figma": {
-      "url": "https://mcp.figma.com/mcp"
-    },
-    "figma-desktop": {
-      "url": "http://127.0.0.1:3845/mcp"
-    },
-    "figma-console": {
-      "command": "npx",
-      "args": ["-y", "figma-console-mcp@latest"],
-      "env": {
-        "FIGMA_ACCESS_TOKEN": "figd_YOUR_TOKEN_HERE"
-      }
+    "penpot": {
+        "command": "npx",
+        "args": ["-y", "mcp-remote", "http://localhost:4401/mcp", "--allow-http"]
     }
   }
 }
