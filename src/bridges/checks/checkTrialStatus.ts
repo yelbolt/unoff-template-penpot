@@ -1,6 +1,10 @@
 import globalConfig from '../../global.config'
 
+// Resolves trial and plan status from stored trial data.
+// Returns 'PAID' when trial is active or pro is disabled, otherwise undefined
+// (Penpot has no native payment API).
 const checkTrialStatus = async () => {
+  // ── Storage reads ─────────────────────────────────────────────────────
   const trialStartDate = penpot.localStorage.getItem('trial_start_date')
   const currentTrialVersion: string =
     penpot.localStorage.getItem('trial_version') ??
@@ -9,6 +13,7 @@ const checkTrialStatus = async () => {
     penpot.localStorage.getItem('trial_time') ?? '72'
   )
 
+  // ── Consumed time + trial status ──────────────────────────────────────
   let consumedTime = 0,
     trialStatus = 'UNUSED'
 
@@ -32,12 +37,14 @@ const checkTrialStatus = async () => {
     else trialStatus = 'UNUSED'
   }
 
+  // ── Plan status resolution ─────────────────────────────────────────────
   let planStatus
 
   if (trialStatus === 'PENDING' || !globalConfig.plan.isProEnabled)
     planStatus = 'PAID'
   else planStatus = undefined
 
+  // ── Send result to UI ──────────────────────────────────────────────────
   penpot.ui.sendMessage({
     type: 'CHECK_TRIAL_STATUS',
     data: {
