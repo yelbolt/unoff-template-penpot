@@ -161,7 +161,7 @@ All these files reference the full documentation in `.claude/skills/unoff-create
 │                       loadUI.ts                                 │
 │                  (src/bridges/loadUI.ts)                        │
 │                                                                 │
-│  penpot.ui.onMessage = async (msg: any) => {                   │
+│  penpot.ui.onMessage(async (msg: any) => {                   │
 │    const path = msg.pluginMessage                               │
 │    const actions = {                                            │
 │      ACTION_NAME: async () => { ... },                         │
@@ -222,7 +222,7 @@ handleAction = () => {
 
 ```typescript
 // src/bridges/loadUI.ts
-penpot.ui.onMessage = async (msg: any) => {
+penpot.ui.onMessage(async (msg: any) => {
   const path = msg.pluginMessage  // always unwrap .pluginMessage
   const actions: { [key: string]: () => void } = {
     CREATE_NODE: async () => {
@@ -243,7 +243,7 @@ penpot.ui.onMessage = async (msg: any) => {
   } catch {
     return actions['DEFAULT']?.()
   }
-}
+})
 ```
 
 #### 3. UI Receives Response
@@ -283,7 +283,7 @@ handleMessage = (event: MessageEvent) => {
 const loadUI = async () => {
   penpot.ui.open('{{ pluginName }}', globalConfig.urls.uiUrl, { width, height })
 
-  penpot.ui.onMessage = async (msg: any) => {
+  penpot.ui.onMessage(async (msg: any) => {
     const path = msg.pluginMessage
     const actions = {
       LOAD_DATA: async () => { /* ... */ },

@@ -62,7 +62,7 @@ import { sendPluginMessage } from '../utils/pluginMessage'
 sendPluginMessage({ pluginMessage: { type: 'ACTION', data: {...} } })
 
 // Canvas → UI (in loadUI.ts)
-penpot.ui.onMessage = async (msg: any) => {
+penpot.ui.onMessage(async (msg: any) => {
   const path = msg.pluginMessage  // always unwrap .pluginMessage
   const actions: { [key: string]: () => void } = {
     ACTION: () => {
@@ -76,7 +76,7 @@ penpot.ui.onMessage = async (msg: any) => {
   } catch {
     return actions['DEFAULT']?.()
   }
-}
+})
 ```
 
 ## Critical Rules
