@@ -8,13 +8,13 @@
 
 ### Documentation by Layer
 
-**📂 Canvas** - Figma API operations
-- [Figma API](.claude/skills/unoff-create-plugin/canvas/figma-api.md)
-- [Data Storage](.claude/skills/unoff-create-plugin/canvas/data-storage.md)
+**📂 Canvas** - Penpot API operations
+- [Penpot API](.claude/skills/unoff-create-plugin/canvas/penpot/canvas-api.md)
+- [Data Storage](.claude/skills/unoff-create-plugin/canvas/penpot/data-storage.md)
 
 **🌉 Bridge** - Communication layer
-- [Communication Pattern](.claude/skills/unoff-create-plugin/bridge/communication-pattern.md)
-- [Bridge Functions](.claude/skills/unoff-create-plugin/bridge/bridge-functions.md)
+- [Communication Pattern](.claude/skills/unoff-create-plugin/bridge/penpot/communication-pattern.md)
+- [Bridge Functions](.claude/skills/unoff-create-plugin/bridge/penpot/bridge-functions.md)
 
 **⚙️ Config** - Build & quality
 - [Global Config](.claude/skills/unoff-create-plugin/config/global-config.md)
@@ -43,7 +43,7 @@
 
 ## Project Architecture
 
-This is a Figma plugin built with TypeScript, Preact (aliased via preact/compat), and Vite. Uses PureComponent class components + HOCs. Nanostores for lightweight state. Separates Canvas logic (Figma API) from UI logic (Preact).
+This is a Penpot plugin built with TypeScript, Preact (aliased via preact/compat), and Vite. Uses PureComponent class components + HOCs. Nanostores for lightweight state. Separates Canvas logic (Penpot API) from UI logic (Preact).
 
 ## Directory Structure
 
@@ -51,16 +51,16 @@ This is a Figma plugin built with TypeScript, Preact (aliased via preact/compat)
 - `.eslintrc.json`, `.prettierrc.json` - Code quality
 - `tsconfig.json` - TypeScript config
 - `vite.config.ts` - Build config
-- `manifest.json` - Figma plugin manifest
+- `manifest.json` - Penpot plugin manifest
 
-### `/src/bridges/` - Figma Canvas Integration
-**Purpose**: Interact with Figma Canvas API (nodes, styles, variables, storage)
+### `/src/bridges/` - Penpot Canvas Integration
+**Purpose**: Interact with Penpot Canvas API (shapes, boards, fills, storage)
 
 **Key File**: `loadUI.ts` - Message router between UI and Canvas
 
 **Subdirectories**: `/checks/` (validations), `/plans/` (subscriptions)
 
-**See**: [Figma API Guide](.claude/skills/unoff-create-plugin/canvas/figma-api.md) • [Bridge Functions](.claude/skills/unoff-create-plugin/bridge/bridge-functions.md)
+**See**: [Penpot API Guide](.claude/skills/unoff-create-plugin/canvas/penpot/canvas-api.md) • [Bridge Functions](.claude/skills/unoff-create-plugin/bridge/penpot/bridge-functions.md)
 
 ### `/src/app/` - React UI Application
 
@@ -116,7 +116,7 @@ static features = (planStatus, config, service, editor) => ({
 
 ### Architecture Flow
 ```
-UI Component → sendPluginMessage() → loadUI.ts → Bridge Functions → Figma API
+UI Component → sendPluginMessage() → loadUI.ts → Bridge Functions → Penpot API
               (pluginMessage.ts)       (router)                         
 ```
 
@@ -129,16 +129,16 @@ sendPluginMessage({ pluginMessage: { type: 'ACTION', data: {...} } })
 ### Canvas → UI
 ```typescript
 // In loadUI.ts or bridge files
-figma.ui.postMessage({ type: 'RESULT', data: {...} })
+penpot.ui.sendMessage({ type: 'RESULT', data: {...} })
 
 // In UI component
 useEffect(() => {
-  const handleMessage = (event: MessageEvent) => {
-    const msg = event.data.pluginMessage
+  const handleMessage = (event: CustomEvent) => {
+    const msg = (event as CustomEvent).detail
     if (msg?.type === 'RESULT') { /* handle */ }
   }
-  window.addEventListener('message', handleMessage)
-  return () => window.removeEventListener('message', handleMessage)
+  window.addEventListener('platformMessage', handleMessage)
+  return () => window.removeEventListener('platformMessage', handleMessage)
 }, [])
 ```
 
@@ -146,7 +146,7 @@ useEffect(() => {
 - UI → Canvas: `VERB_NOUN` (e.g., `CREATE_NODE`)
 - Canvas → UI: `NOUN_PAST_TENSE` (e.g., `NODE_CREATED`)
 
-**For complete communication patterns** → [Communication Pattern](.claude/skills/unoff-create-plugin/bridge/communication-pattern.md)
+**For complete communication patterns** → [Communication Pattern](.claude/skills/unoff-create-plugin/bridge/penpot/communication-pattern.md)
 
 ## External Services
 
@@ -199,7 +199,7 @@ useEffect(() => {
 - Conditional service init (Sentry/Mixpanel only in production)
 - Singleton pattern for external service clients
 - Build: `viteSingleFile` (zero network requests), platform CSS stripping
-- Batch Figma operations
+- Batch Penpot operations
 - See [Performance Guide](.claude/skills/unoff-create-plugin/ui/performance.md) for full patterns
 
 ---

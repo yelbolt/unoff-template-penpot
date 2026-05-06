@@ -1,8 +1,8 @@
-# Figma Plugin Template Architecture
+# Penpot Plugin Template Architecture
 
 ## Overview
 
-This template is a Figma plugin built with **TypeScript**, **Preact** (aliased as React via `preact/compat`), and **Vite**. The architecture strictly separates Canvas logic (Figma API) from UI logic (Preact) through a message-based communication system.
+This template is a Penpot plugin built with **TypeScript**, **Preact** (aliased as React via `preact/compat`), and **Vite**. The architecture strictly separates Canvas logic (Penpot API) from UI logic (Preact) through a message-based communication system.
 
 ## Full Documentation
 
@@ -12,8 +12,8 @@ For detailed documentation and implementation guides, see:
 
 The documentation is organized into five layers:
 
-- **Canvas** — Figma API operations ([figma-api.md](.claude/skills/unoff-create-plugin/canvas/figma-api.md), [data-storage.md](.claude/skills/unoff-create-plugin/canvas/data-storage.md))
-- **Bridge** — UI ↔ Canvas communication ([communication-pattern.md](.claude/skills/unoff-create-plugin/bridge/communication-pattern.md), [bridge-functions.md](.claude/skills/unoff-create-plugin/bridge/bridge-functions.md))
+- **Canvas** — Penpot API operations ([canvas-api.md](.claude/skills/unoff-create-plugin/canvas/penpot/canvas-api.md), [data-storage.md](.claude/skills/unoff-create-plugin/canvas/penpot/data-storage.md))
+- **Bridge** — UI ↔ Canvas communication ([communication-pattern.md](.claude/skills/unoff-create-plugin/bridge/penpot/communication-pattern.md), [bridge-functions.md](.claude/skills/unoff-create-plugin/bridge/penpot/bridge-functions.md))
 - **Config** — Feature flags, credits, build system ([global-config.md](.claude/skills/unoff-create-plugin/config/global-config.md), [feature-flags.md](.claude/skills/unoff-create-plugin/config/feature-flags.md), [vite-build.md](.claude/skills/unoff-create-plugin/config/vite-build.md))
 - **UI** — Preact application ([component-library.md](.claude/skills/unoff-create-plugin/ui/component-library.md), [component-patterns.md](.claude/skills/unoff-create-plugin/ui/component-patterns.md), [external-services.md](.claude/skills/unoff-create-plugin/ui/external-services.md), [state-management.md](.claude/skills/unoff-create-plugin/ui/state-management.md), [i18n.md](.claude/skills/unoff-create-plugin/ui/i18n.md))
 - **Externals** — Integration workflows ([payment-systems.md](.claude/skills/unoff-create-plugin/externals/payment-systems.md))
@@ -28,7 +28,6 @@ This project is configured to work with all major AI development tools:
 | **Cursor** | `.cursor/rules/project.mdc` | Configuration for Cursor AI |
 | **Windsurf** | `.windsurf/rules/project.md` | Configuration for Windsurf AI |
 | **Claude (VS Code)** | `.claude/settings.json` | Configuration for Claude in VS Code |
-| **Figma MCP** | `.vscode/mcp.json` `.cursor/mcp.json` `.windsurf/mcp.json` | MCP servers for Figma design-to-code |
 
 All these files reference the full documentation in `.claude/skills/unoff-create-plugin/` as a single source of truth.
 
@@ -45,11 +44,13 @@ All these files reference the full documentation in `.claude/skills/unoff-create
 │       └── unoff-create-plugin/  # Detailed documentation by layer
 │           ├── README.md           # Documentation index
 │           ├── canvas/             # Canvas layer
-│           │   ├── figma-api.md
-│           │   └── data-storage.md
+│           │   └── penpot/
+│           │       ├── canvas-api.md
+│           │       └── data-storage.md
 │           ├── bridge/             # Bridge layer
-│           │   ├── communication-pattern.md
-│           │   └── bridge-functions.md
+│           │   └── penpot/
+│           │       ├── communication-pattern.md
+│           │       └── bridge-functions.md
 │           ├── config/             # Config & build layer
 │           │   ├── global-config.md
 │           │   ├── feature-flags.md
@@ -74,14 +75,14 @@ All these files reference the full documentation in `.claude/skills/unoff-create
 │   ├── CODEOWNERS             # Code ownership
 │   ├── ISSUE_TEMPLATE/        # Issue templates
 │   └── workflows/             # CI/CD workflows
-├── .mcp.json                   # MCP servers (Figma remote + desktop)
+├── .mcp.json                   # MCP servers (Penpot remote + desktop)
 ├── .vscode/                    # VS Code settings
 ├── workers/                    # Cloudflare Workers (git submodules, optional)
 │   ├── announcement-worker/    # unoff add announcement-worker
 │   ├── auth-worker/            # unoff add auth-worker
 │   └── cors-worker/            # unoff add cors-worker
 ├── src/
-│   ├── bridges/               # Figma Canvas Layer
+│   ├── bridges/               # Penpot Canvas Layer
 │   │   ├── loadUI.ts          # Message Router (central hub)
 │   │   ├── checks/            # Validation functions
 │   │   └── plans/             # Subscription management
@@ -140,7 +141,7 @@ All these files reference the full documentation in `.claude/skills/unoff-create
 ├── tsconfig.json              # TypeScript configuration
 ├── vite.config.ts             # Vite build configuration
 ├── package.json               # Dependencies & scripts
-└── manifest.json              # Figma plugin manifest
+└── manifest.json              # Penpot plugin manifest
 ```
 
 ## Communication System
@@ -160,11 +161,12 @@ All these files reference the full documentation in `.claude/skills/unoff-create
 │                       loadUI.ts                                 │
 │                  (src/bridges/loadUI.ts)                        │
 │                                                                 │
-│  figma.ui.onmessage = async (msg) => {                         │
+│  penpot.ui.onMessage = async (msg: any) => {                   │
+│    const path = msg.pluginMessage                               │
 │    const actions = {                                            │
 │      ACTION_NAME: async () => { ... },                         │
 │    }                                                            │
-│    actions[msg.type]()                                          │
+│    actions[path.type]?.()                                       │
 │  }                                                              │
 └────────────────────────┬────────────────────────────────────────┘
                          │
@@ -182,19 +184,19 @@ All these files reference the full documentation in `.claude/skills/unoff-create
                          │ Interacts with
                          ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│                       Figma API                                 │
+│                      Penpot API                                 │
 │                                                                 │
-│  - figma.createRectangle()                                      │
-│  - figma.clientStorage.setAsync()                               │
-│  - figma.currentPage.selection                                  │
+│  - penpot.createRectangle()                                     │
+│  - penpot.localStorage.setItem()                                │
+│  - penpot.selection                                             │
 └─────────────────────────────────────────────────────────────────┘
                          │
                          │ Response via
-                         │ figma.ui.postMessage()
+                         │ penpot.ui.sendMessage()
                          ▼
 ┌─────────────────────────────────────────────────────────────────┐
 │                    UI Component                                 │
-│         window.addEventListener('message', ...)                 │
+│         window.addEventListener('platformMessage', ...)         │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -220,21 +222,26 @@ handleAction = () => {
 
 ```typescript
 // src/bridges/loadUI.ts
-figma.ui.onmessage = async (msg) => {
+penpot.ui.onMessage = async (msg: any) => {
+  const path = msg.pluginMessage  // always unwrap .pluginMessage
   const actions: { [key: string]: () => void } = {
     CREATE_NODE: async () => {
-      const node = figma.createRectangle()
-      node.resize(msg.data.width, msg.data.height)
+      const node = penpot.createRectangle()
+      node.resize(path.data.width, path.data.height)
 
-      figma.ui.postMessage({
+      // Penpot API operations
+      penpot.ui.sendMessage({
         type: 'NODE_CREATED',
         data: { id: node.id, name: node.name }
       })
-    }
+    },
+    DEFAULT: () => null,
   }
 
-  if (actions[msg.type]) {
-    await actions[msg.type]()
+  try {
+    return actions[path.type]?.()
+  } catch {
+    return actions['DEFAULT']?.()
   }
 }
 ```
@@ -244,15 +251,15 @@ figma.ui.onmessage = async (msg) => {
 ```typescript
 // src/app/ui/components/MyComponent.tsx
 componentDidMount = () => {
-  window.addEventListener('message', this.handleMessage)
+  window.addEventListener('platformMessage', this.handleMessage)
 }
 
 componentWillUnmount = () => {
-  window.removeEventListener('message', this.handleMessage)
+  window.removeEventListener('platformMessage', this.handleMessage)
 }
 
 handleMessage = (event: MessageEvent) => {
-  const msg = event.data.pluginMessage
+  const msg = (event as CustomEvent).detail
   if (msg?.type === 'NODE_CREATED') {
     this.setState({ nodeId: msg.data.id })
   }
@@ -274,17 +281,20 @@ handleMessage = (event: MessageEvent) => {
 **Pattern**:
 ```typescript
 const loadUI = async () => {
-  figma.showUI(__html__, { width, height, title, themeColors: true })
+  penpot.ui.open('{{ pluginName }}', globalConfig.urls.uiUrl, { width, height })
 
-  figma.ui.onmessage = async (msg) => {
+  penpot.ui.onMessage = async (msg: any) => {
+    const path = msg.pluginMessage
     const actions = {
       LOAD_DATA: async () => { /* ... */ },
       CREATE_NODE: async () => { /* ... */ },
       SAVE_PREFERENCES: async () => { /* ... */ },
     }
 
-    if (actions[msg.type]) {
-      await actions[msg.type]()
+    try {
+      return actions[path.type]?.()
+    } catch {
+      return null
     }
   }
 }
@@ -320,7 +330,7 @@ Always use `sendPluginMessage()` from UI components — never call `parent.postM
 | `plans/` | Subscription management (enableTrial, payProPlan) |
 
 **Rules**:
-- Figma API interaction only
+- Penpot API interaction only
 - Async/await functions with try/catch
 - No Preact code, no DOM manipulation
 
@@ -377,14 +387,14 @@ const credits = useStore($creditsCount)
 - Use `sendPluginMessage()` to communicate with Canvas
 - Strict TypeScript — no `any`
 - Use `@unoff/ui` and `@unoff/utils`
-- No direct Figma API calls, no `parent.postMessage()` directly
+- No direct Penpot API calls, no `parent.postMessage()` directly
 - Never recreate components that already exist in `@unoff/ui`
 
 ### UI Component Libraries
 
 #### `@unoff/ui`
 
-Pre-built UI components for Figma plugins. Full API at [ui.unoff.dev](https://ui.unoff.dev/).
+Pre-built UI components for Penpot plugins. Full API at [ui.unoff.dev](https://ui.unoff.dev/).
 
 **Available components**:
 - **Layout**: Bar, Layout, Section, SectionTitle, SimpleItem, List, Card
@@ -454,12 +464,12 @@ const className = doClassnames([layouts['snackbar--medium'], texts['type'], isAc
 | `tsconfig.json` | TypeScript strict mode |
 | `vite.config.ts` | Dual Vite build (IIFE Canvas + single-file UI) |
 | `.cursor/rules/project.mdc` | Cursor AI guidelines |
-| `.cursor/mcp.json` | MCP servers (Figma remote + desktop) |
+| `.cursor/mcp.json` | MCP servers (Penpot remote + desktop) |
 | `.windsurf/rules/project.md` | Windsurf AI guidelines |
-| `.windsurf/mcp.json` | MCP servers (Figma remote + desktop) |
+| `.windsurf/mcp.json` | MCP servers (Penpot remote + desktop) |
 | `.claude/settings.json` | Claude (VS Code) guidelines |
 | `.github/copilot-instructions.md` | GitHub Copilot guidelines |
-| `.vscode/mcp.json` | MCP servers (Figma remote + desktop) |
+| `.vscode/mcp.json` | MCP servers (Penpot remote + desktop) |
 
 ### Available Scripts
 
@@ -513,7 +523,7 @@ Worker scripts are injected automatically by `unoff add <worker>`.
 1. Always use `sendPluginMessage()` from UI components
 2. Always route messages through `loadUI.ts`
 3. Use the `actions` map pattern for handlers
-4. Send responses back with `figma.ui.postMessage()`
+4. Send responses back with `penpot.ui.sendMessage()`
 
 ### TypeScript
 1. Strict mode enabled — no `any` (use `unknown` if necessary)
@@ -529,7 +539,7 @@ Worker scripts are injected automatically by `unoff add <worker>`.
 ### State Management
 1. Nanostores `atom` for shared state (prefix with `$`)
 2. `useStore()` from `@nanostores/preact` in components
-3. `figma.clientStorage` for persistent user preferences (synced via bridge)
+3. `penpot.localStorage` for persistent user preferences (synced via bridge)
 
 ### Organization
 1. Strict Canvas / UI separation — never mix them
@@ -581,7 +591,7 @@ unoff remove <worker>   # Remove a worker submodule
 
 ## Resources
 
-- [Figma Plugin API](https://www.figma.com/plugin-docs/)
+- [Penpot Plugin API](https://help.penpot.app/technical-guide/plugins/)
 - [Preact Documentation](https://preactjs.com/)
 - [TypeScript Handbook](https://www.typescriptlang.org/docs/)
 - [Vite Guide](https://vitejs.dev/guide/)
@@ -591,4 +601,4 @@ unoff remove <worker>   # Remove a worker submodule
 
 ---
 
-**Note**: This document is automatically generated when creating a plugin with `unoff create figma-plugin`.
+**Note**: This document is automatically generated when creating a plugin with `unoff create penpot-plugin`.

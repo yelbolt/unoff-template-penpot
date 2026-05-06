@@ -1,20 +1,20 @@
 ---
-description: Core project rules for {{ pluginName }} Figma plugin. Apply when working on any aspect of this Figma plugin project.
+description: Core project rules for {{ pluginName }} Penpot plugin. Apply when working on any aspect of this Penpot plugin project.
 globs:
 alwaysApply: true
 ---
 
 # Cursor Rules for {{ pluginName }}
 
-You are an expert Figma plugin developer working on a TypeScript/React project.
+You are an expert Penpot plugin developer working on a TypeScript/React project.
 
 ## 📚 Complete Documentation
 
 **For comprehensive patterns, examples, and best practices, always refer to:**
 
 - **[Architecture & Skills Documentation](.claude/skills/unoff-create-plugin/README.md)** - Complete implementation guide
-  - **Canvas Layer**: [Figma API](.claude/skills/unoff-create-plugin/canvas/figma-api.md) • [Data Storage](.claude/skills/unoff-create-plugin/canvas/data-storage.md)
-  - **Bridge Layer**: [Communication](.claude/skills/unoff-create-plugin/bridge/communication-pattern.md) • [Functions](.claude/skills/unoff-create-plugin/bridge/bridge-functions.md)
+  - **Canvas Layer**: [Penpot API](.claude/skills/unoff-create-plugin/canvas/penpot/canvas-api.md) • [Data Storage](.claude/skills/unoff-create-plugin/canvas/penpot/data-storage.md)
+  - **Bridge Layer**: [Communication](.claude/skills/unoff-create-plugin/bridge/penpot/communication-pattern.md) • [Functions](.claude/skills/unoff-create-plugin/bridge/penpot/bridge-functions.md)
   - **Config Layer**: [Global Config](.claude/skills/unoff-create-plugin/config/global-config.md) • [Feature Flags](.claude/skills/unoff-create-plugin/config/feature-flags.md) • [Credits System](.claude/skills/unoff-create-plugin/config/credits-system.md) • [Vite Build](.claude/skills/unoff-create-plugin/config/vite-build.md) • [Code Quality](.claude/skills/unoff-create-plugin/config/code-quality.md)
   - **UI Layer**: [Components](.claude/skills/unoff-create-plugin/ui/component-library.md) • [Patterns](.claude/skills/unoff-create-plugin/ui/component-patterns.md) • [Services](.claude/skills/unoff-create-plugin/ui/external-services.md) • [State](.claude/skills/unoff-create-plugin/ui/state-management.md) • [i18n](.claude/skills/unoff-create-plugin/ui/i18n.md) • [Types](.claude/skills/unoff-create-plugin/ui/types-system.md) • [Errors](.claude/skills/unoff-create-plugin/ui/error-handling.md) • [CSS/Theming](.claude/skills/unoff-create-plugin/ui/css-theming.md) • [Accessibility](.claude/skills/unoff-create-plugin/ui/accessibility.md) • [Performance](.claude/skills/unoff-create-plugin/ui/performance.md) • [Bootstrap](.claude/skills/unoff-create-plugin/ui/app-bootstrap.md)
   - **Externals**: [Implement Design](.claude/skills/unoff-create-plugin/externals/implement-design) — Figma spec document → code workflow (annotations, MCP, unoff-ui) • [Payment Systems](.claude/skills/unoff-create-plugin/externals/payment-systems.md) — Figma built-in vs Lemon Squeezy, must choose one
@@ -25,7 +25,7 @@ You are an expert Figma plugin developer working on a TypeScript/React project.
 - TypeScript (strict mode) + Preact (aliased via preact/compat) + Vite
 - PureComponent class components + HOCs (WithConfig, WithTranslation)
 - Nanostores (lightweight atoms, $prefix convention)
-- Figma Plugin API
+- Penpot Plugin API
 - @unoff/ui (component library)
 - @unoff/utils (utilities)
 - Tolgee (UI translations) + createI18n (Canvas translations)
@@ -42,8 +42,8 @@ You are an expert Figma plugin developer working on a TypeScript/React project.
 ## Core Architecture
 
 ### Two-Context System
-1. **Canvas Context** (`/src/bridges/`) - Figma API access, NO React/DOM
-2. **UI Context** (`/src/app/`) - React UI, NO direct Figma API
+1. **Canvas Context** (`/src/bridges/`) - Penpot API access, NO React/DOM
+2. **UI Context** (`/src/app/`) - React UI, NO direct Penpot API
 3. **Communication** - PostMessage pattern
 
 ### Key Files
@@ -58,7 +58,7 @@ import { sendPluginMessage } from '../utils/pluginMessage'
 sendPluginMessage({ pluginMessage: { type: 'ACTION_NAME', data: {...} } })
 
 // Canvas → UI (in loadUI.ts)
-figma.ui.postMessage({ type: 'EVENT_NAME', data: {...} })
+penpot.ui.sendMessage({ type: 'EVENT_NAME', data: {...} })
 ```
 
 ## Critical Rules
@@ -73,7 +73,7 @@ figma.ui.postMessage({ type: 'EVENT_NAME', data: {...} })
 - **Refer to skills documentation for detailed patterns**
 
 ### ❌ DON'T
-- Mix Figma API in React components
+- Mix Penpot API in React components
 - Mix React in bridge files
 - Use `parent.postMessage()` directly
 - Create UI components when unoff-ui has them
@@ -106,7 +106,7 @@ For complete component examples → [Component Library](.claude/skills/unoff-cre
 
 ```
 /src/
-├── bridges/              # Canvas (Figma API only)
+├── bridges/              # Canvas (Penpot API only)
 │   ├── loadUI.ts         # ⭐ Message router
 │   ├── checks/           # Validations
 │   └── plans/            # Subscriptions
@@ -146,7 +146,7 @@ For complete component examples → [Component Library](.claude/skills/unoff-cre
 - Remove DOM for inactive features (not `display: none`)
 - Conditional service init (Sentry/Mixpanel only in production)
 - Build: `viteSingleFile` (zero network requests), platform CSS stripping
-- Batch Figma operations
+- Batch Penpot operations
 - See [Performance Guide](.claude/skills/unoff-create-plugin/ui/performance.md)
 
 ---

@@ -1,6 +1,6 @@
 # Claude AI Rules for {{ pluginName }}
 
-You are an expert Figma plugin developer working on a TypeScript/React project.
+You are an expert Penpot plugin developer working on a TypeScript/React project.
 
 ## 📚 Complete Documentation
 
@@ -10,13 +10,13 @@ For comprehensive, detailed documentation, refer to:
 
 This documentation is organized into four main layers:
 
-### 📂 Canvas - Figma API Layer
-- **[Figma API](.claude/skills/unoff-create-plugin/canvas/figma-api.md)** - Node creation, styles, variables, selection, viewport
-- **[Data Storage](.claude/skills/unoff-create-plugin/canvas/data-storage.md)** - Plugin Data, Shared Plugin Data, Client Storage, migration
+### 📂 Canvas - Penpot API Layer
+- **[Penpot API](.claude/skills/unoff-create-plugin/canvas/penpot/canvas-api.md)** - Node creation, styles, variables, selection, viewport
+- **[Data Storage](.claude/skills/unoff-create-plugin/canvas/penpot/data-storage.md)** - Plugin Data, Shared Plugin Data, Client Storage, migration
 
 ### 🌉 Bridge - Communication Layer
-- **[Communication Pattern](.claude/skills/unoff-create-plugin/bridge/communication-pattern.md)** - Architecture, message flow, type conventions, request-response
-- **[Bridge Functions](.claude/skills/unoff-create-plugin/bridge/bridge-functions.md)** - Pure functions, loadUI.ts action map, check functions
+- **[Communication Pattern](.claude/skills/unoff-create-plugin/bridge/penpot/communication-pattern.md)** - Architecture, message flow, type conventions, request-response
+- **[Bridge Functions](.claude/skills/unoff-create-plugin/bridge/penpot/bridge-functions.md)** - Pure functions, loadUI.ts action map, check functions
 
 ### ⚙️ Config - Build & Quality Layer
 - **[Global Config](.claude/skills/unoff-create-plugin/config/global-config.md)** - Config type, sections, env vars, service toggles
@@ -45,7 +45,7 @@ This documentation is organized into four main layers:
 ## Quick Reference
 
 ### Project Type
-Figma Plugin with Preact UI and TypeScript
+Penpot Plugin with Preact UI and TypeScript
 
 ### Tech Stack
 - TypeScript (strict mode)
@@ -53,7 +53,7 @@ Figma Plugin with Preact UI and TypeScript
 - PureComponent class components + HOCs (WithConfig, WithTranslation)
 - Nanostores (lightweight state, $prefix convention)
 - Vite (dual build: UI HTML + Canvas IIFE)
-- Figma Plugin API
+- Penpot Plugin API
 - @unoff/ui (component library)
 - @unoff/utils (utilities)
 - Tolgee (UI translations) + createI18n (Canvas translations)
@@ -70,8 +70,8 @@ Figma Plugin with Preact UI and TypeScript
 ### Core Architecture
 
 #### Two-Context System
-1. **Canvas Context** (`/src/bridges/`) - Figma API access, no DOM
-2. **UI Context** (`/src/app/`) - React UI, no direct Figma API
+1. **Canvas Context** (`/src/bridges/`) - Penpot API access, no DOM
+2. **UI Context** (`/src/app/`) - React UI, no direct Penpot API
 3. **Communication** - PostMessage via `sendPluginMessage()`
 
 #### Key Files
@@ -93,7 +93,7 @@ sendPluginMessage({
 })
 
 // Canvas → UI
-figma.ui.postMessage({
+penpot.ui.sendMessage({
   type: 'RECTANGLE_CREATED',
   data: { id: 'node-id' }
 })
@@ -115,7 +115,7 @@ figma.ui.postMessage({
 - Refer to skills documentation for detailed patterns
 
 ### ❌ DON'T
-- Mix Figma API calls in React components
+- Mix Penpot API calls in React components
 - Mix React code in bridge files
 - Use `parent.postMessage()` directly (use `sendPluginMessage()`)
 - Create custom UI components when unoff-ui has them
@@ -127,7 +127,7 @@ figma.ui.postMessage({
 
 ```
 /src/
-├── bridges/              # Canvas logic (Figma API)
+├── bridges/              # Canvas logic (Penpot API)
 │   ├── loadUI.ts         # Message router ⭐
 │   ├── checks/           # Validations
 │   └── plans/            # Subscriptions
@@ -182,7 +182,7 @@ VITE_MIXPANEL_TOKEN=xxxxx
 - Conditional service initialization (Sentry/Mixpanel only in production)
 - Singleton pattern for external service clients
 - Build: `viteSingleFile` (zero network requests), platform CSS stripping
-- Batch Figma operations when possible
+- Batch Penpot operations when possible
 - See [Performance Guide](.claude/skills/unoff-create-plugin/ui/performance.md) for full patterns
 
 ## Additional Resources
