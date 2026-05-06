@@ -8,22 +8,11 @@ import checkTrialStatus from './checks/checkTrialStatus'
 import checkCredits from './checks/checkCredits'
 import checkAnnouncementsStatus from './checks/checkAnnouncementsStatus'
 
-interface Window {
-  width: number
-  height: number
-}
-
 const loadUI = async () => {
-  // Get window size from storage
-  const windowSize: Window = {
-    width: globalConfig.limits.width,
-    height: globalConfig.limits.height,
-  }
-
   // Setup UI
   penpot.ui.open('{{ pluginName }}', globalConfig.urls.uiUrl, {
-    width: windowSize.width,
-    height: windowSize.height,
+    width: globalConfig.limits.width,
+    height: globalConfig.limits.height,
   })
 
   // Listen to messages from UI to Canvas
@@ -32,6 +21,7 @@ const loadUI = async () => {
     const path = msg.pluginMessage
 
     const actions: { [key: string]: () => void } = {
+      // ── Startup ──────────────────────────────────────────────────────
       LOAD_DATA: () => {
         const accessToken = penpot.localStorage.getItem('supabase_access_token')
         const refreshToken = penpot.localStorage.getItem(
@@ -71,15 +61,18 @@ const loadUI = async () => {
           .then(() => checkUserLicense())
           .then(() => checkUserPreferences())
       },
-      //
+
+      // ── Announcements ─────────────────────────────────────────────────
       CHECK_ANNOUNCEMENTS_STATUS: () =>
         checkAnnouncementsStatus(path.data.version),
-      //
+
+      // ── Preferences ───────────────────────────────────────────────────
       UPDATE_LANGUAGE: () => {
         penpot.localStorage.setItem('user_language', path.data.lang)
         tolgee.changeLanguage(path.data.lang)
       },
-      //
+
+      // ── Storage ───────────────────────────────────────────────────────
       SET_ITEMS: () => {
         path.items.forEach((item: { key: string; value: unknown }) => {
           if (typeof item.value === 'object')
@@ -105,7 +98,8 @@ const loadUI = async () => {
         path.items.forEach(async (item: string) => {
           penpot.localStorage.setItem(item, '')
         }),
-      //
+
+      // ── Browser ───────────────────────────────────────────────────────
       OPEN_IN_BROWSER: () =>
         penpot.ui.sendMessage({
           type: 'OPEN_IN_BROWSER',
@@ -123,7 +117,8 @@ const loadUI = async () => {
           },
         })
       },
-      //
+
+      // ── Plans ─────────────────────────────────────────────────────────
       ENABLE_TRIAL: async () => {
         enableTrial(path.data.trialTime, path.data.trialVersion).then(() =>
           checkTrialStatus()
@@ -175,7 +170,8 @@ const loadUI = async () => {
         penpot.ui.sendMessage({
           type: 'WELCOME_TO_PRO',
         }),
-      //
+
+      // ── Auth ──────────────────────────────────────────────────────────
       SIGN_OUT: () =>
         penpot.ui.sendMessage({
           type: 'SIGN_OUT',
@@ -186,7 +182,7 @@ const loadUI = async () => {
             id: undefined,
           },
         }),
-      //
+
       DEFAULT: () => null,
     }
 
@@ -197,7 +193,7 @@ const loadUI = async () => {
     }
   })
 
-  // Listeners
+  // ── Listeners ───────────────────────────────────────────────────────
   penpot.on('themechange', () => {
     penpot.ui.sendMessage({
       type: 'SET_THEME',
