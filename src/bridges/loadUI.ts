@@ -1,4 +1,6 @@
 import globalConfig from '../global.config'
+import TodoChecklist from '../canvas/TodoChecklist'
+import ColorPalette from '../canvas/ColorPalette'
 import { tolgee } from '..'
 import enableTrial from './plans/enableTrial'
 import checkUserPreferences from './checks/checkUserPreferences'
@@ -171,6 +173,17 @@ const loadUI = async () => {
           type: 'WELCOME_TO_PRO',
         }),
 
+      // ── Canvas ───────────────────────────────────────────────────────
+      GENERATE_TODO_ON_CANVAS: () => {
+        const checklist = new TodoChecklist({ items: path.data.items })
+        penpot.currentPage.appendChild(checklist.node)
+      },
+      GENERATE_COLOR_PALETTE: () => {
+        const palette = new ColorPalette({ baseColor: path.data.baseColor })
+        penpot.currentPage.appendChild(palette.node)
+      },
+      GET_SELECTION: () => sendSelectionInfo(),
+
       // ── Auth ──────────────────────────────────────────────────────────
       SIGN_OUT: () =>
         penpot.ui.sendMessage({
@@ -201,6 +214,37 @@ const loadUI = async () => {
         theme: penpot.theme === 'light' ? 'penpot-light' : 'penpot-dark',
       },
     })
+  })
+
+  penpot.on('selectionchange', () => sendSelectionInfo())
+}
+
+// ── Selection helper ─────────────────────────────────────────────────────────
+
+const sendSelectionInfo = () => {
+  const selection = penpot.selection
+  if (selection.length === 0) {
+    penpot.ui.sendMessage({ type: 'SET_SELECTION_INFO', data: null })
+    return
+  }
+  const shape = selection[0]
+  let fill: string | undefined
+  if (shape.fills && shape.fills.length > 0) {
+    const firstFill = shape.fills[0]
+    fill = firstFill.fillColor ?? undefined
+  }
+  penpot.ui.sendMessage({
+    type: 'SET_SELECTION_INFO',
+    data: {
+      name: shape.name,
+      type: shape.type,
+      width: Math.round(shape.width ?? 0),
+      height: Math.round(shape.height ?? 0),
+      x: Math.round(shape.x ?? 0),
+      y: Math.round(shape.y ?? 0),
+      fill,
+      opacity: Math.round((shape.opacity ?? 1) * 100),
+    },
   })
 }
 
