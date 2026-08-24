@@ -61,8 +61,6 @@
     "@unoff/ui": "^1.25.1",
     "@unoff/utils": "^0.8.2",
     "mixpanel-browser": "^2.66.0",
-    "preact": "^10.6.4",
-    "react": "npm:@preact/compat",
-    "react-dom": "npm:@preact/compat"
+    "preact": "^10.6.4"
   }
 }
