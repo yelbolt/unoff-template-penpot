@@ -54,7 +54,7 @@ const globalConfig: Config = {
     databaseUrl: import.meta.env.VITE_SUPABASE_URL as string,
     authUrl: import.meta.env.VITE_AUTH_URL as string,
     storeApiUrl: import.meta.env.VITE_LEMONSQUEEZY_URL as string,
-    platformUrl: 'https://www.penpot.com',
+    platformUrl: '*',
     uiUrl: isDev ? 'http://localhost:4400' : 'https://ui.{{ pluginSlug }}.com',
     documentationUrl: 'https://uno.ylb.lt/docs',
     repositoryUrl: 'https://github.com/yelbolt/unoff-template-penpot',
